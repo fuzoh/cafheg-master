@@ -77,7 +77,7 @@ class AllocationServiceTest {
   @Test
   void getParentDroitAllocation() {
     FamilyComposition parameters = new FamilyComposition(NE, NE, BE, true, true, false, 2500, 3000, true, true, NE, BE, false, false);
-    assertThat(allocationService.getParentDroitAllocation(parameters)).isEqualTo("Parent2");
+    assertThat(allocationService.getParentDroitAllocation(parameters)).isEqualTo("Parent1");
   }
 
   @Test
@@ -112,13 +112,13 @@ class AllocationServiceTest {
 
   @Test
   void getParentDroitAllocation_Given2ParentAL2ParentAP2ParentREParent1Independant_ShouldBeParent2() {
-    FamilyComposition parameters = new FamilyComposition(NE, NE, NE, true, true, false, 2500, 3000, true, true, NE, BE, true, false);
+    FamilyComposition parameters = new FamilyComposition(NE, NE, NE, true, true, false, 2500, 3000, true, true, NE, NE, true, false);
     assertThat(allocationService.getParentDroitAllocation(parameters)).isEqualTo("Parent2");
   }
 
   @Test
   void getParentDroitAllocation_Given2ParentAL2ParentAP2ParentREParent2RevenueHigher_ShouldBeParent2() {
-    FamilyComposition parameters = new FamilyComposition(NE, NE, NE, true, true, false, 2500, 3000, true, true, NE, BE, false, false);
+    FamilyComposition parameters = new FamilyComposition(NE, NE, NE, true, true, false, 2500, 3000, true, true, BE, BE, false, false);
     assertThat(allocationService.getParentDroitAllocation(parameters)).isEqualTo("Parent2");
   }
 
