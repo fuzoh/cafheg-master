@@ -23,7 +23,7 @@
     <logger name="ch.hearc.cafheg" level="info">
         <appender-ref ref="CH_INFO_BY_DAY_FILE_APPENDER"/>
     </logger>
-    <logger name="ch.hearc.ig" level="debug">
+    <root level="debug">
         <appender-ref ref="STDOUT"/>
-    </logger>
+    </root>
 </configuration>
