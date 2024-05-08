@@ -1,0 +1,20 @@
+###
+POST http://localhost:8080/droits/quel-parent
+
+###
+POST http://localhost:8080/allocataires
+
+###
+POST http://localhost:8080/allocations
+
+###
+POST http://localhost:8080/allocations/{year}/somme
+
+###
+POST http://localhost:8080/allocations-naissances/{year}/somme
+
+###
+POST http://localhost:8080/allocataires/{allocataireId}/allocations
+
+###
+POST http://localhost:8080/allocataires/{allocataireId}/versements
