@@ -30,25 +30,60 @@ public class AllocationService {
     return allocationMapper.findAll();
   }
 
-  public String getParentDroitAllocation(Map<String, Object> parameters) {
+  public String getParentDroitAllocation(FamilyComposition parameters) {
     System.out.println("Déterminer quel parent a le droit aux allocations");
-    String eR = (String)parameters.getOrDefault("enfantResidence", "");
-    Boolean p1AL = (Boolean)parameters.getOrDefault("parent1ActiviteLucrative", false);
-    String p1Residence = (String)parameters.getOrDefault("parent1Residence", "");
-    Boolean p2AL = (Boolean)parameters.getOrDefault("parent2ActiviteLucrative", false);
-    String p2Residence = (String)parameters.getOrDefault("parent2Residence", "");
-    Boolean pEnsemble = (Boolean)parameters.getOrDefault("parentsEnsemble", false);
-    Number salaireP1 = (Number) parameters.getOrDefault("parent1Salaire", BigDecimal.ZERO);
-    Number salaireP2 = (Number) parameters.getOrDefault("parent2Salaire", BigDecimal.ZERO);
 
-    if(p1AL && !p2AL) {
+    if (parameters.getParent2Residence()==null) {
       return PARENT_1;
+    } else {
+      if (parameters.isParent1ActiviteLucrative() && !parameters.isParent2ActiviteLucrative()) {
+        return PARENT_1;
+      } else if (parameters.isParent2ActiviteLucrative() && !parameters.isParent1ActiviteLucrative()) {
+        return PARENT_2;
+      } else if (parameters.isParent1ActiviteLucrative() && parameters.isParent2ActiviteLucrative()) {
+        if (parameters.isParent1AutoriteParentale() && !parameters.isParent2AutoriteParentale()) {
+          return PARENT_1;
+        } else if (parameters.isParent2AutoriteParentale() && !parameters.isParent1AutoriteParentale()) {
+          return PARENT_2;
+        } else if (parameters.isParent1AutoriteParentale() && parameters.isParent2AutoriteParentale()) {
+          if (!parameters.getParent1Residence().equals(parameters.getParent2Residence())) {
+            if (parameters.getEnfantResidence().equals(parameters.getParent1Residence())) {
+              return PARENT_1;
+            } else if (parameters.getEnfantResidence().equals(parameters.getParent2Residence())) {
+              return PARENT_2;
+            }
+          } else {
+            if (parameters.getParent1Workplace().equals(parameters.getEnfantResidence()) && !parameters.getParent2Workplace().equals(parameters.getEnfantResidence())) {
+              return PARENT_1;
+            } else if (parameters.getParent2Workplace().equals(parameters.getEnfantResidence()) && !parameters.getParent1Workplace().equals(parameters.getEnfantResidence())) {
+              return PARENT_2;
+            } else if (parameters.getParent1Workplace().equals(parameters.getEnfantResidence()) && parameters.getParent2Workplace().equals(parameters.getEnfantResidence())) {
+              if (parameters.getParent1Salaire() > parameters.getParent2Salaire()) {
+                return PARENT_1;
+              } else {
+                return PARENT_2;
+              }
+            } else if (parameters.isParent1Independant() && !parameters.isParent2Independant()) {
+              return PARENT_2;
+            } else if (parameters.isParent2Independant() && !parameters.isParent1Independant()) {
+              return PARENT_1;
+            } else if (parameters.isParent1Independant() && parameters.isParent2Independant()) {
+              if (parameters.getParent1Salaire() > parameters.getParent2Salaire()) {
+                return PARENT_1;
+              } else {
+                return PARENT_2;
+              }
+            } else if (!parameters.isParent1Independant() && !parameters.isParent2Independant()) {
+              if (parameters.getParent1Salaire() > parameters.getParent2Salaire()) {
+                return PARENT_1;
+              } else {
+                return PARENT_2;
+              }
+            }
+          }
+        }
+      }
     }
-
-    if(p2AL && !p1AL) {
-      return PARENT_2;
-    }
-
-    return salaireP1.doubleValue() > salaireP2.doubleValue() ? PARENT_1 : PARENT_2;
+    return null;
   }
 }
