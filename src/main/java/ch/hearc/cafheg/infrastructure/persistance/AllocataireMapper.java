@@ -14,6 +14,8 @@ public class AllocataireMapper extends Mapper {
   private static final String QUERY_FIND_ALL = "SELECT NOM,PRENOM,NO_AVS FROM ALLOCATAIRES";
   private static final String QUERY_FIND_WHERE_NOM_LIKE = "SELECT NOM,PRENOM,NO_AVS FROM ALLOCATAIRES WHERE NOM LIKE ?";
   private static final String QUERY_FIND_WHERE_NUMERO = "SELECT NO_AVS, NOM, PRENOM FROM ALLOCATAIRES WHERE NUMERO=?";
+  private static final String QUERY_FIND_WHERE_NO_AVS = "SELECT NO_AVS, NOM, PRENOM FROM ALLOCATAIRES WHERE NO_AVS=?";
+  private static final String QUERY_UPDATE = "UPDATE ALLOCATAIRES SET NOM=?, PRENOM=? WHERE NO_AVS=?";
 
   public List<Allocataire> findAll(String likeNom) {
     System.out.println("findAll() " + likeNom);
@@ -65,6 +67,38 @@ public class AllocataireMapper extends Mapper {
       System.out.println("Allocataire mapping");
       return new Allocataire(new NoAVS(resultSet.getString(1)),
           resultSet.getString(2), resultSet.getString(3));
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public Allocataire findByNoAVS(NoAVS noAVS) {
+    System.out.println("findByNoAVS() " + noAVS);
+    Connection connection = activeJDBCConnection();
+    try {
+      System.out.println("SQL:" + QUERY_FIND_WHERE_NO_AVS);
+      PreparedStatement preparedStatement = connection.prepareStatement(QUERY_FIND_WHERE_NO_AVS);
+      preparedStatement.setString(1, noAVS.getValue());
+      ResultSet resultSet = preparedStatement.executeQuery();
+      System.out.println("ResultSet#next");
+      resultSet.next();
+      System.out.println("Allocataire mapping");
+      return new Allocataire(new NoAVS(resultSet.getString(1)),
+          resultSet.getString(2), resultSet.getString(3));
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void updateAllocataire(Allocataire allocataire) {
+    System.out.println("updateAllocataire() " + allocataire);
+    Connection connection = activeJDBCConnection();
+    try {
+      PreparedStatement preparedStatement = connection.prepareStatement(QUERY_UPDATE);
+      preparedStatement.setString(1, allocataire.getNom());
+      preparedStatement.setString(2, allocataire.getPrenom());
+      preparedStatement.setString(3, allocataire.getNoAVS().getValue());
+      preparedStatement.executeUpdate();
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }

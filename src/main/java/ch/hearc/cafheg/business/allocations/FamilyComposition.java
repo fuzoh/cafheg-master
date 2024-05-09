@@ -18,6 +18,10 @@ public class FamilyComposition {
     private boolean isParent1Independant;
     private boolean isParent2Independant;
 
+    public FamilyComposition(){
+
+    }
+
     public FamilyComposition(Canton enfantResidence, Canton parent1Residence, boolean parent1ActiviteLucrative, boolean parentsEnsemble, int parent1Salaire, boolean parent1AutoriteParentale, Canton parent1Workplace, boolean isParent1Independant) {
         this.enfantResidence = enfantResidence;
         this.parent1Residence = parent1Residence;
