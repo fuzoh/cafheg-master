@@ -2,9 +2,12 @@ package ch.hearc.cafheg.business.allocations;
 
 public class Allocataire {
 
-  private final NoAVS noAVS;
-  private final String nom;
-  private final String prenom;
+  private NoAVS noAVS;
+  private String nom;
+  private String prenom;
+
+  public Allocataire(){
+  }
 
   public Allocataire(NoAVS noAVS, String nom, String prenom) {
     this.noAVS = noAVS;

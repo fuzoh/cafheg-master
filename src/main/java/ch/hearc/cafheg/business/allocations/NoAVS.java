@@ -4,7 +4,10 @@ import java.util.Objects;
 
 public class NoAVS {
 
-  public final String value;
+  public String value;
+
+  public NoAVS() {
+  }
 
   public NoAVS(String value) {
     this.value = value;

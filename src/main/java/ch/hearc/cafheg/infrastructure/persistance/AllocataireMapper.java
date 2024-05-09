@@ -15,7 +15,7 @@ public class AllocataireMapper extends Mapper {
   private static final String QUERY_FIND_WHERE_NOM_LIKE = "SELECT NOM,PRENOM,NO_AVS FROM ALLOCATAIRES WHERE NOM LIKE ?";
   private static final String QUERY_FIND_WHERE_NUMERO = "SELECT NO_AVS, NOM, PRENOM FROM ALLOCATAIRES WHERE NUMERO=?";
   private static final String QUERY_FIND_WHERE_NO_AVS = "SELECT NO_AVS, NOM, PRENOM FROM ALLOCATAIRES WHERE NO_AVS=?";
-  private static final String QUERY_UPDATE = "UPDATE ALLOCATAIRES SET NOM=?, PRENOM=? WHERE NO_AVS=?";
+  private static final String QUERY_UPDATE = "UPDATE ALLOCATAIRES SET PRENOM=?, NOM=? WHERE NO_AVS=?";
 
   public List<Allocataire> findAll(String likeNom) {
     System.out.println("findAll() " + likeNom);
@@ -43,8 +43,8 @@ public class AllocataireMapper extends Mapper {
         while (resultSet.next()) {
           System.out.println("ResultSet#next");
           allocataires
-              .add(new Allocataire(new NoAVS(resultSet.getString(3)), resultSet.getString(2),
-                  resultSet.getString(1)));
+              .add(new Allocataire(new NoAVS(resultSet.getString(3)), resultSet.getString(1),
+                  resultSet.getString(2)));
         }
       }
       System.out.println("Allocataires trouvés " + allocataires.size());
@@ -73,7 +73,7 @@ public class AllocataireMapper extends Mapper {
   }
 
   public Allocataire findByNoAVS(NoAVS noAVS) {
-    System.out.println("findByNoAVS() " + noAVS);
+    System.out.println("findByNoAVS() " + noAVS.getValue());
     Connection connection = activeJDBCConnection();
     try {
       System.out.println("SQL:" + QUERY_FIND_WHERE_NO_AVS);
@@ -90,17 +90,27 @@ public class AllocataireMapper extends Mapper {
     }
   }
 
-  public void updateAllocataire(Allocataire allocataire) {
+  public String updateAllocataire(Allocataire allocataire) {
     System.out.println("updateAllocataire() " + allocataire);
     Connection connection = activeJDBCConnection();
-    try {
-      PreparedStatement preparedStatement = connection.prepareStatement(QUERY_UPDATE);
-      preparedStatement.setString(1, allocataire.getNom());
-      preparedStatement.setString(2, allocataire.getPrenom());
-      preparedStatement.setString(3, allocataire.getNoAVS().getValue());
-      preparedStatement.executeUpdate();
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
+    Allocataire baseAllocataire = findByNoAVS(allocataire.getNoAVS());
+    if  (baseAllocataire == null) {
+      throw new RuntimeException("Allocataire non trouvé");
+    } else {
+      if (!baseAllocataire.getNom().equals(allocataire.getNom()) || !baseAllocataire.getPrenom().equals(allocataire.getPrenom())) {
+        try {
+          PreparedStatement preparedStatement = connection.prepareStatement(QUERY_UPDATE);
+          preparedStatement.setString(1, allocataire.getPrenom());
+          preparedStatement.setString(2, allocataire.getNom());
+          preparedStatement.setString(3, allocataire.getNoAVS().getValue());
+          preparedStatement.executeUpdate();
+          return "Allocataire mis à jour";
+        } catch (SQLException e) {
+          throw new RuntimeException(e);
+        }
+      } else {
+        return "Aucune modification à apporter";
+      }
     }
   }
 }
