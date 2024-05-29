@@ -71,5 +71,22 @@ public class VersementService {
     return pdfExporter.generatePDFAllocataire(allocataire, montantsParEnfant);
   }
 
+  public boolean existVersementByAllocataire(Allocataire allocataire) {
+    if (versementMapper.findAllVersementByAllocataire(allocataire).isEmpty()){
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  public List<VersementAllocation> findVersementsByAllocataire(Allocataire allocataire) {
+    System.out.println("Rechercher les versements pour l'allocataire " + allocataire.getNoAVS().getValue());
+    return versementMapper.findAllVersementByAllocataire(allocataire);
+  }
+
+  public List<VersementAllocation> findVersements() {
+    return versementMapper.findAllVersementAllocation();
+  }
+
 
 }

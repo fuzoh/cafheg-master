@@ -22,4 +22,20 @@ public class AllocataireServiceTest {
         String result = allocataireService.updateAllocataire(allocataire);
         assert(result.equals("success"));
     }
+
+    @Test
+    void deleteAllocataire() {
+        Allocataire allocataire = new Allocataire(new NoAVS("1000-2000"), "Geiser", "Arnaud");
+        Mockito.when(allocataireMapper.deleteAllocataire(allocataire)).thenReturn("success");
+        String result = allocataireService.deleteAllocataire(allocataire);
+        assert(result.equals("success"));
+    }
+
+    @Test
+    void deleteAllocataireWithVersement(){
+        Allocataire allocataire = new Allocataire(new NoAVS("756.1558.5343.97"), "Lamar", "Kendrick");
+        Mockito.when(allocataireMapper.deleteAllocataire(allocataire)).thenReturn("Impossible de supprimer l'allocataire car il a des versements");
+        String result = allocataireService.deleteAllocataire(allocataire);
+        assert(result.equals("Impossible de supprimer l'allocataire car il a des versements"));
+    }
 }

@@ -3,6 +3,7 @@ package ch.hearc.cafheg.infrastructure.api;
 import static ch.hearc.cafheg.infrastructure.persistance.Database.inTransaction;
 
 import ch.hearc.cafheg.business.allocations.*;
+import ch.hearc.cafheg.business.versements.VersementAllocation;
 import ch.hearc.cafheg.business.versements.VersementService;
 import ch.hearc.cafheg.infrastructure.pdf.PDFExporter;
 import ch.hearc.cafheg.infrastructure.persistance.AllocataireMapper;
@@ -52,6 +53,15 @@ public class RESTController {
     return inTransaction(() -> allocataireService.updateAllocataire(allocataire));
   }
 
+  @DeleteMapping("/allocataireDelete")
+  public String deleteAllocataire(@RequestBody Allocataire allocataire) {
+    if (inTransaction(() -> versementService.existVersementByAllocataire(allocataire))){
+      return "Impossible de supprimer l'allocataire car il a des versements";
+    } else {
+      return inTransaction(() -> allocataireService.deleteAllocataire(allocataire));
+    }
+  }
+
   @GetMapping("/allocataires")
   public List<Allocataire> allocataires(
       @RequestParam(value = "startsWith", required = false) String start) {
@@ -82,5 +92,15 @@ public class RESTController {
   @GetMapping(value = "/allocataires/{allocataireId}/versements", produces = MediaType.APPLICATION_PDF_VALUE)
   public byte[] pdfVersements(@PathVariable("allocataireId") int allocataireId) {
     return inTransaction(() -> versementService.exportPDFVersements(allocataireId));
+  }
+
+  @GetMapping("/allocataire/versements")
+  public List<VersementAllocation> findVersementsByAllocataire(@RequestBody Allocataire allocataire) {
+    return inTransaction(() -> versementService.findVersementsByAllocataire(allocataire));
+  }
+
+  @GetMapping("/versements")
+  public List<VersementAllocation> findVersements() {
+    return inTransaction(() -> versementService.findVersements());
   }
 }

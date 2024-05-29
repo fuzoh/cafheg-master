@@ -17,4 +17,8 @@ public class AllocataireService {
     public String updateAllocataire(Allocataire allocataire) {
         return allocataireMapper.updateAllocataire(allocataire);
     }
+
+    public String deleteAllocataire(Allocataire allocataire) {
+        return allocataireMapper.deleteAllocataire(allocataire);
+    }
 }

@@ -1,5 +1,6 @@
 package ch.hearc.cafheg.infrastructure.persistance;
 
+import ch.hearc.cafheg.business.allocations.Allocataire;
 import ch.hearc.cafheg.business.allocations.Allocation;
 import ch.hearc.cafheg.business.allocations.Canton;
 import ch.hearc.cafheg.business.common.Montant;

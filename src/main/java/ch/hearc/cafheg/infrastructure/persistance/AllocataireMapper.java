@@ -19,6 +19,7 @@ public class AllocataireMapper extends Mapper {
   private static final String QUERY_FIND_WHERE_NUMERO = "SELECT NO_AVS, NOM, PRENOM FROM ALLOCATAIRES WHERE NUMERO=?";
   private static final String QUERY_FIND_WHERE_NO_AVS = "SELECT NO_AVS, NOM, PRENOM FROM ALLOCATAIRES WHERE NO_AVS=?";
   private static final String QUERY_UPDATE = "UPDATE ALLOCATAIRES SET PRENOM=?, NOM=? WHERE NO_AVS=?";
+  private static final String QUERY_DELETE = "DELETE FROM ALLOCATAIRES WHERE NO_AVS=?";
   private static final Logger logger = LoggerFactory.getLogger(AllocataireMapper.class);
 
   public List<Allocataire> findAll(String likeNom) {
@@ -116,5 +117,23 @@ public class AllocataireMapper extends Mapper {
         return "Aucune modification à apporter";
       }
     }
+  }
+
+  public String deleteAllocataire(Allocataire allocataire) {
+    logger.info("deleteAllocataire() " + allocataire);
+    Connection connection = activeJDBCConnection();
+    Allocataire baseAllocataire = findByNoAVS(allocataire.getNoAVS());
+    if  (baseAllocataire == null) {
+      throw new RuntimeException("Allocataire non trouvé");
+    } else {
+      try {
+        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DELETE);
+        preparedStatement.setString(1, allocataire.getNoAVS().getValue());
+        preparedStatement.executeUpdate();
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    return "Allocataire supprimé";
   }
 }
