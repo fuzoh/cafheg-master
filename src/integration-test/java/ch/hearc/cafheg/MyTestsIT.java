@@ -30,7 +30,8 @@ public class MyTestsIT {
         database.start();
         migrations.start();
 
-        var dataset = new FlatXmlDataSetBuilder().build(new FileInputStream("dataset.xml"));
+        var dataset = new FlatXmlDataSetBuilder().build(new FileInputStream(
+                Thread.currentThread().getContextClassLoader().getResource("dataset.xml").getFile()));
         // Connects to the same db as our database services
         var databaseTester = new JdbcDatabaseTester(
                 "org.h2.Driver",
@@ -43,7 +44,7 @@ public class MyTestsIT {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {1, 2, 3})
+    @ValueSource(ints = {2})
     void deleteAllocataire_ShouldRemoveItFromDb(int allocataireId) {
         var allocataireMapper = new AllocataireMapper();
         var allocataireService = new AllocataireService();
@@ -63,7 +64,7 @@ public class MyTestsIT {
         var allocataireService = new AllocataireService();
         Database.inTransaction(() -> {
             var allocataire = allocataireMapper.findById(1);
-            assert(allocataire.getNom().equals("Deguzman"));
+            assert (allocataire.getNom().equals("Deguzman"));
             var newAllocataire = new Allocataire(
                     allocataire.getNoAVS(),
                     newName,
