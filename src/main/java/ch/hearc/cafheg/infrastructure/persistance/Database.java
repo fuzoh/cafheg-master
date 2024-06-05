@@ -19,7 +19,7 @@ public class Database {
    * active.
    * @return Connection JDBC active
    */
-  static Connection activeJDBCConnection() {
+  public static Connection activeJDBCConnection() {
     if(connection.get() == null) {
       throw new RuntimeException("Pas de connection JDBC active");
     }
