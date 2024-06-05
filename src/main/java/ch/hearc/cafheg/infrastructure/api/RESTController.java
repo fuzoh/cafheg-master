@@ -55,11 +55,7 @@ public class RESTController {
 
   @DeleteMapping("/allocataireDelete")
   public String deleteAllocataire(@RequestBody Allocataire allocataire) {
-    if (inTransaction(() -> versementService.existVersementByAllocataire(allocataire))){
-      return "Impossible de supprimer l'allocataire car il a des versements";
-    } else {
       return inTransaction(() -> allocataireService.deleteAllocataire(allocataire));
-    }
   }
 
   @GetMapping("/allocataires")

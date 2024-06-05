@@ -1,6 +1,8 @@
 package ch.hearc.cafheg.business.allocations;
 
+import ch.hearc.cafheg.business.versements.VersementService;
 import ch.hearc.cafheg.infrastructure.persistance.AllocataireMapper;
+import ch.hearc.cafheg.infrastructure.persistance.VersementMapper;
 
 public class AllocataireService {
 
@@ -19,6 +21,15 @@ public class AllocataireService {
     }
 
     public String deleteAllocataire(Allocataire allocataire) {
-        return allocataireMapper.deleteAllocataire(allocataire);
+        VersementService versementService = new VersementService(
+                new VersementMapper(),
+                this.allocataireMapper,
+                null
+        );
+        if (versementService.existVersementByAllocataire(allocataire)){
+            return "Impossible de supprimer l'allocataire car il a des versements";
+        } else {
+            return allocataireMapper.deleteAllocataire(allocataire);
+        }
     }
 }

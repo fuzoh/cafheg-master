@@ -3,9 +3,11 @@ package ch.hearc.cafheg;
 import ch.hearc.cafheg.business.allocations.Allocataire;
 import ch.hearc.cafheg.business.allocations.AllocataireService;
 import ch.hearc.cafheg.business.allocations.AllocationService;
+import ch.hearc.cafheg.business.versements.VersementService;
 import ch.hearc.cafheg.infrastructure.persistance.AllocataireMapper;
 import ch.hearc.cafheg.infrastructure.persistance.Database;
 import ch.hearc.cafheg.infrastructure.persistance.Migrations;
+import ch.hearc.cafheg.infrastructure.persistance.VersementMapper;
 import org.dbunit.JdbcDatabaseTester;
 import org.dbunit.operation.DatabaseOperation;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +32,7 @@ public class MyTestsIT {
         database.start();
         migrations.start();
 
-        var dataset = new FlatXmlDataSetBuilder().build(new FileInputStream(
+        var dataSet = new FlatXmlDataSetBuilder().build(new FileInputStream(
                 Thread.currentThread().getContextClassLoader().getResource("dataset.xml").getFile()));
         // Connects to the same db as our database services
         var databaseTester = new JdbcDatabaseTester(
@@ -40,7 +42,7 @@ public class MyTestsIT {
                 ""
         );
         // Load the dataset into the db
-        DatabaseOperation.CLEAN_INSERT.execute(databaseTester.getConnection(), dataset);
+        DatabaseOperation.CLEAN_INSERT.execute(databaseTester.getConnection(), dataSet);
     }
 
     @ParameterizedTest
@@ -48,11 +50,37 @@ public class MyTestsIT {
     void deleteAllocataire_ShouldRemoveItFromDb(int allocataireId) {
         var allocataireMapper = new AllocataireMapper();
         var allocataireService = new AllocataireService();
+        var versmentMapper = new VersementMapper();
+        var versmentService = new VersementService(
+                versmentMapper,
+                new AllocataireMapper(),
+                null
+        );
         Database.inTransaction(() -> {
             var allocataire = allocataireMapper.findById(allocataireId);
             assertNotNull(allocataire);
-            allocataireService.deleteAllocataire(allocataire);
-            assertNull(allocataireMapper.findById(allocataireId));
+            assertFalse(versmentService.existVersementByAllocataire(allocataire));
+            assertEquals("Allocataire supprimé", allocataireService.deleteAllocataire(allocataire));
+            return null;
+        });
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1})
+    void deleteAllocataire_ShouldNotRemoveItFromDb(int allocataireId) {
+        var allocataireMapper = new AllocataireMapper();
+        var allocataireService = new AllocataireService();
+        var versmentMapper = new VersementMapper();
+        var versmentService = new VersementService(
+                versmentMapper,
+                new AllocataireMapper(),
+                null
+        );
+        Database.inTransaction(() -> {
+            var allocataire = allocataireMapper.findById(allocataireId);
+            assertNotNull(allocataire);
+            assertTrue(versmentService.existVersementByAllocataire(allocataire));
+            assertEquals("Impossible de supprimer l'allocataire car il a des versements", allocataireService.deleteAllocataire(allocataire));
             return null;
         });
     }
